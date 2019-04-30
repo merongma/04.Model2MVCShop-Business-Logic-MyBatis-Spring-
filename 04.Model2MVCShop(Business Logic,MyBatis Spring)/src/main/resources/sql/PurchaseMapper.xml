@@ -42,7 +42,7 @@
   		SELECT 
 		prod_no, buyer_id, payment_option, receiver_name, receiver_phone, demailaddr, dlvy_request, dlvy_date, order_data, tran_status_code, tran_no
 		FROM transaction
-		WHERE prod_no = #{prod_no}
+		WHERE prod_no = #{value}
   	</select>
   	
 	 
@@ -60,12 +60,12 @@
 	   	WHERE tran_no = #{tranNo}
 	 </update>
 
-	  <update	id="updateTrancode"	parameterType="purchase" >
+	  <update	id="updateTranCode"	parameterType="purchase" >
 	   	UPDATE transaction
 	   	<set>
 		tran_status_code=#{tranCode}	
 	   	</set>
-	   	WHERE prod_no = #{prodNo}
+	   	WHERE prod_no = #{purchaseProd.prodNo}
 	 </update>
 		 
 	<!-- SQL : SELECT LIST -->
@@ -75,21 +75,7 @@
 	  					FROM		(	SELECT *
 											FROM transaction
 											<where>
-												 p.prod_no= t.prod_no(+)
-												 <if test="searchCondition != null">
-													<if test="searchCondition ==0 and searchKeyword !='' ">
-										 				AND p.prod_no like '%${searchKeyword}%'
-													</if>
-													<if test="searchCondition ==1 and searchKeyword !='' ">
-										 				AND p.prod_name like '%${searchKeyword}%'
-													</if>
-													<if test ="searchCondition==2 and searchKeywokd!='' ">
-														AND p.price like '%${searchKeyword}%'
-													</if>
-													</if>
-												</where>
-											
-											ORDER BY p.prod_no ) inner_table
+												 buyer_id=#{buyerId}</where> ) inner_table
 						WHERE ROWNUM &lt;= #{endRowNum} )
 		WHERE row_seq BETWEEN #{startRowNum} AND #{endRowNum} 
 	 </select>
@@ -110,22 +96,9 @@
 	<!-- SQL : SELECT ROW Count -->	 
 	 <select  id="getTotalCount"  parameterType="search"	 resultType="int">
 	  	SELECT COUNT(*)
-	  	FROM(	SELECT p.prod_no, p.prod_name, p.price, p.reg_date, t.tran_status_code
-						FROM product p, transaction t
-							<where>
-							 p.prod_no= t.prod_no(+)
-							<if test="searchCondition != null">
-								<if test="searchCondition == 0 and searchKeyword !='' ">
-						 			AND p.prod_no like '%${searchKeyword}%'
-								</if>
-								<if test="searchCondition == 1 and searchKeyword !='' ">
-						 			AND p.prod_name like '%${searchKeyword}%'
-								</if>
-								<if test="searchCondition==2 and searchKeyword!='' ">
-									AND p.price like '%${searchKeyword}%'
-								</if>
-							</if> 
-						</where>) countTable						
+	  	FROM(	SELECT tran_no
+						FROM transaction 
+							) countTable						
 	 </select>
 	 
 </mapper>

@@ -1,6 +1,7 @@
 package com.model2.mvc.service.purchase.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
@@ -30,7 +31,7 @@ public class PurchaseDaoImpl implements PurchaseDao {
 	@Override
 	public void addPurchase(Purchase purchase) throws Exception {
 		sqlSession.insert("PurchaseMapper.addPurchase",purchase);
-		
+	
 	}
 
 	@Override
@@ -40,21 +41,24 @@ public class PurchaseDaoImpl implements PurchaseDao {
 
 	@Override
 	public Purchase getPurchase2(int ProdNo) throws Exception {
-		return sqlSession.selectOne("PurchaseMapper.getPurchase",ProdNo);
+		return sqlSession.selectOne("PurchaseMapper.getPurchase2",ProdNo);
 	}
 
 	@Override
 	public Map<String, Object> getPurchaseList(Search search, String buyerId) throws Exception {
 		
-		Map<String, String> map = new HashMap<String, String>();
-		User user = new User();
-		map.put("searchCondition", search.getSearchCondition() );
-		map.put("searchKeyword",  search.getSearchKeyword() );
+		Map<String, Object> map = new HashMap<String, Object>();
+		Purchase purchase = new Purchase();
+		
 		map.put("endRowNum",  search.getEndRowNum()+"" );
 		map.put("startRowNum",  search.getStartRowNum()+"" );
-		map.put("buyerId", user.getUserId());
-		return (Map<String, Object>) sqlSession.selectList("PurchaseMapper.getPurchaseList", map);
-	}
+		map.put("buyerId",buyerId);
+		
+		List<Purchase> list = sqlSession.selectList("PurchaseMapper.getPurchaseList", map);
+		map.put("list", list);
+		
+		return map;
+	}	
 
 	@Override
 	public Map<String, Object> getSaleList(Search search) throws Exception {
